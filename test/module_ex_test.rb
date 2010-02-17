@@ -84,6 +84,25 @@ class ModuleExTest < Test::Unit::TestCase
     assert_equal 'another_allowedC', Liquid::Template.parse("{{ a.chainedB.chainedC.another_allowedC }}").render('a'=>@a)
     assert_equal '', Liquid::Template.parse("{{ a.restricted }}").render('a'=>@a)
     assert_equal '', Liquid::Template.parse("{{ a.unknown }}").render('a'=>@a)
- end
+  end
+ 
+  def test_should_use_ruby_objects_as_drops
+    assert_equal '1', Liquid::Template.parse("{{ a }}").render('a'=>1)
+    assert_equal 'some string', Liquid::Template.parse("{{ a }}").render('a'=>"some string")
+    assert_equal 'some_symbol', Liquid::Template.parse("{{ a }}").render('a'=>:some_symbol)
+    assert_equal '', Liquid::Template.parse("{{ a }}").render('a'=>[])
+    assert_equal '', Liquid::Template.parse("{{ a }}").render('a'=>nil)
+    assert_equal '', Liquid::Template.parse("{{ a }}").render('a'=>false)
+    assert_equal 'true', Liquid::Template.parse("{{ a }}").render('a'=>true)
+    
+    now = DateTime.now
+    assert_equal "#{now.to_s}", Liquid::Template.parse("{{ a }}").render('a'=>now)
+
+    now = Time.now
+    assert_equal "#{now.to_s}", Liquid::Template.parse("{{ a }}").render('a'=>now)
+
+    now = Date.today
+    assert_equal "#{now.to_s}", Liquid::Template.parse("{{ a }}").render('a'=>now)
+  end
 
 end
